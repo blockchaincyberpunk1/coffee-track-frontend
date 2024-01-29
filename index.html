@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supply Chain DApp</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet" />
+
+</head>
+
+<body>
+    <div class="container">
+        <!-- Navigation Menu -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Supply Chain DApp</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#farmerSection">Farmer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#distributorSection">Distributor</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#retailerSection">Retailer</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#consumerSection">Consumer</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <h1 class="text-center my-4">Supply Chain DApp</h1>
+
+        <!-- Before Connect to MetaMask Button -->
+        <span id="userAccount" class="mr-3">Not connected</span>
+
+        <!-- Connect to MetaMask Button -->
+        <button id="connectMetamask" class="btn btn-secondary mt-4">
+            Connect to MetaMask
+        </button>
+
+
+        <div id="realTimeNotifications" class="my-4">
+            <h3>Real-time Notifications</h3>
+            <!-- Transaction Status Section -->
+        <div id="transactionStatus" class="alert" style="display: none"></div>
+            <!-- <ul id="notificationsList">
+                 Notifications will be appended here 
+            </ul> -->
+        </div>
+
+        <!-- Admin Panel Section (Initially hidden) -->
+        <section id="adminPanelSection" class="my-4" style="display: none">
+            <h2>Admin Panel</h2>
+            <div class="row">
+                <div class="col-12 col-md-6">
+                    <button id="toggleContractStateBtn" class="btn btn-warning">
+                        Toggle Contract State
+                        <span id="toggleSpinner" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true" style="display: none;"></span>
+                    </button>
+                </div>
+                <div class="col-12 col-md-6">
+                    <button id="checkContractStateBtn" class="btn btn-info">
+                        Check Contract State
+                        <span id="checkSpinner" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true" style="display: none;"></span>
+                    </button>
+                </div>
+                <div class="col-12">
+                    <label for="newOwnerAddress">New Owner Address:</label>
+                    <input type="text" id="newOwnerAddress" class="form-control" placeholder="0x...">
+                    <button id="transferOwnershipBtn" class="btn btn-success mt-2">
+                        Transfer Ownership
+                        <span id="transferSpinner" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true" style="display: none;"></span>
+                    </button>
+                </div>
+                <div class="col-12">
+                    <button id="renounceOwnershipBtn" class="btn btn-danger">
+                        Renounce Ownership
+                        <span id="renounceSpinner" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true" style="display: none;"></span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        
+
+        <!-- Farmer Section -->
+        <section id="farmerSection" class="my-4">
+            <h2>Farmer</h2>
+
+            <!-- Add and Remove Farmer -->
+            <div class="row">
+                <div class="col-md-6 my-2">
+                    <label for="addFarmerAddress">Add Farmer Address:</label>
+                    <div class="input-group">
+                        <input type="text" id="addFarmerAddress" class="form-control" placeholder="0x...">
+                        <div class="input-group-append">
+                            <button id="addFarmerBtn" class="btn btn-primary">
+                                Add Farmer
+                                <span id="addFarmerSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 my-2">
+                    <label for="removeFarmerAddress">Remove Farmer Address:</label>
+                    <div class="input-group">
+                        <input type="text" id="removeFarmerAddress" class="form-control" placeholder="0x...">
+                        <div class="input-group-append">
+                            <button id="removeFarmerBtn" class="btn btn-danger">
+                                Remove Farmer
+                                <span id="removeFarmerSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Farmer Actions -->
+            <div class="my-2">
+                <h4>Farmer Actions</h4>
+                <div class="my-2">
+                    <label for="farmerUPC" class="form-label">UPC:</label>
+                    <input type="text" id="farmerUPC" class="form-control" placeholder="Product UPC" />
+                </div>
+                <!-- Harvest Item Modal Trigger -->
+                <button type="button" class="btn btn-secondary mt-2" data-toggle="modal"
+                    data-target="#harvestItemModal">
+                    Harvest Item
+                </button>
+
+                <!-- Harvest Item Modal -->
+                <div class="modal fade" id="harvestItemModal" tabindex="-1" aria-labelledby="harvestItemModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="harvestItemModalLabel">
+                                    Harvest Item
+                                </h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="harvestItemForm">
+                                    <div class="form-group">
+                                        <label for="harvestUPC">UPC:</label>
+                                        <input type="text" class="form-control" id="harvestUPC"
+                                            placeholder="Enter UPC" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="originFarmName">Farm Name:</label>
+                                        <input type="text" class="form-control" id="originFarmName"
+                                            placeholder="Enter Farm Name" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="originFarmInformation">Farm Information:</label>
+                                        <textarea class="form-control" id="originFarmInformation" rows="2"
+                                            placeholder="Enter Farm Information"></textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="originFarmLatitude">Farm Latitude:</label>
+                                        <input type="text" class="form-control" id="originFarmLatitude"
+                                            placeholder="Enter Farm Latitude" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="originFarmLongitude">Farm Longitude:</label>
+                                        <input type="text" class="form-control" id="originFarmLongitude"
+                                            placeholder="Enter Farm Longitude" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="productNotes">Product Notes:</label>
+                                        <textarea class="form-control" id="productNotes" rows="2"
+                                            placeholder="Enter Product Notes"></textarea>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                    Close
+                                </button>
+                                <button type="submit" class="btn btn-primary" form="harvestItemForm">
+                                    Harvest <span id="harvestSpinner" class="spinner-border spinner-border-sm"
+                                        role="status" aria-hidden="true" style="display: none;"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Farmer Actions Continued -->
+                <div class="my-2">
+                    <h4>Farmer Actions</h4>
+                    <div class="row">
+                        <!-- Process Item Button -->
+                        <div class="col-sm-4 my-2">
+                            <button id="processItemBtn" class="btn btn-secondary w-100">
+                                Process Item
+                                <span id="processItemSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span>
+                            </button>
+                        </div>
+
+                        <!-- Pack Item Button -->
+                        <div class="col-sm-4 my-2">
+                            <button id="packItemBtn" class="btn btn-secondary w-100">
+                                Pack Item
+                                <span id="packItemSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span>
+                            </button>
+                        </div>
+
+                        <!-- Sell Item Modal Trigger -->
+                        <div class="col-sm-4 my-2">
+                            <button type="button" class="btn btn-secondary w-100" data-toggle="modal"
+                                data-target="#sellItemModal">
+                                Sell Item
+                            </button>
+                        </div>
+                    </div>
+
+
+                    <!-- Sell Item Modal -->
+                    <div class="modal fade" id="sellItemModal" tabindex="-1" aria-labelledby="sellItemModalLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="sellItemModalLabel">Sell Item</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="sellItemForm">
+                                        <div class="form-group">
+                                            <label for="sellUPC">UPC:</label>
+                                            <input type="text" class="form-control" id="sellUPC"
+                                                placeholder="Enter UPC" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="sellPrice">Price:</label>
+                                            <input type="number" class="form-control" id="sellPrice"
+                                                placeholder="Enter Price (in Ether)" />
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                        Close
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" form="sellItemForm">
+                                        Sell
+                                    </button>
+                                    <!-- Spinner for Selling Item -->
+                                    <span id="sellItemSpinner" class="spinner-border spinner-border-sm" role="status"
+                                        aria-hidden="true" style="display: none;"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </section>
+
+        <!-- Distributor Section -->
+        <section id="distributorSection" class="my-4">
+            <h2>Distributor</h2>
+
+            <!-- Add and Remove Distributor -->
+            <div class="row">
+                <!-- Add Distributor -->
+                <div class="col-md-6 my-2">
+                    <label for="addDistributorAddress" class="form-label">Add Distributor Address:</label>
+                    <div class="input-group">
+                        <input type="text" id="addDistributorAddress" class="form-control" placeholder="0x...">
+                        <div class="input-group-append">
+                            <button id="addDistributorBtn" class="btn btn-primary">Add Distributor <span
+                                    id="addDistributorSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remove Distributor -->
+                <div class="col-md-6 my-2">
+                    <label for="removeDistributorAddress" class="form-label">Remove Distributor Address:</label>
+                    <div class="input-group">
+                        <input type="text" id="removeDistributorAddress" class="form-control" placeholder="0x...">
+                        <div class="input-group-append">
+                            <button id="removeDistributorBtn" class="btn btn-danger">Remove Distributor <span
+                                    id="removeDistributorSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Distributor Actions -->
+            <div class="my-2">
+                <h4>Distributor Actions</h4>
+                <div class="row">
+                    <!-- Buy Item -->
+                    <div class="col-sm-6 my-2">
+                        <label for="buyItemUPC" class="form-label">UPC to Buy:</label>
+                        <div class="input-group">
+                            <input type="text" id="buyItemUPC" class="form-control" placeholder="UPC">
+                            <div class="input-group-append">
+                                <button id="buyItemBtn" class="btn btn-secondary">
+                                    Buy Item
+                                    <span id="buyItemSpinner" class="spinner-border spinner-border-sm" role="status"
+                                        aria-hidden="true" style="display: none;"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ship Item -->
+                    <div class="col-sm-6 my-2">
+                        <label for="shipItemUPC" class="form-label">UPC to Ship:</label>
+                        <div class="input-group">
+                            <input type="text" id="shipItemUPC" class="form-control" placeholder="UPC">
+                            <div class="input-group-append">
+                                <button id="shipItemBtn" class="btn btn-secondary">
+                                    Ship Item
+                                    <span id="shipItemSpinner" class="spinner-border spinner-border-sm" role="status"
+                                        aria-hidden="true" style="display: none;"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Retailer Section -->
+        <section id="retailerSection" class="my-4">
+            <h2>Retailer</h2>
+
+            <div class="row">
+                <!-- Add Retailer -->
+                <div class="col-md-6 my-2">
+                    <label for="addRetailerAddress" class="form-label">Add Retailer Address:</label>
+                    <div class="input-group">
+                        <input type="text" id="addRetailerAddress" class="form-control" placeholder="0x...">
+                        <div class="input-group-append">
+                            <button id="addRetailerBtn" class="btn btn-primary">Add Retailer <span
+                                    id="addRetailerSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remove Retailer -->
+                <div class="col-md-6 my-2">
+                    <label for="removeRetailerAddress" class="form-label">Remove Retailer Address:</label>
+                    <div class="input-group">
+                        <input type="text" id="removeRetailerAddress" class="form-control" placeholder="0x...">
+                        <div class="input-group-append">
+                            <button id="removeRetailerBtn" class="btn btn-danger">Remove Retailer<span
+                                    id="removeRetailerSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span>
+                            </button></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Retailer Actions -->
+            <div class="my-2">
+                <h4>Retailer Actions</h4>
+                <div class="input-group">
+                    <label for="receiveItemUPC" class="form-label">UPC of Item to Receive:</label>
+                    <input type="text" id="receiveItemUPC" class="form-control" placeholder="UPC">
+                    <div class="input-group-append">
+                        <button id="receiveItemBtn" class="btn btn-secondary">
+                            Receive Item
+                            <span id="receiveItemSpinner" class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true" style="display: none;"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Consumer Section -->
+        <section id="consumerSection" class="my-4">
+            <h2>Consumer</h2>
+
+            <div class="row">
+                <!-- Add Consumer -->
+                <div class="col-md-6 my-2">
+                    <label for="addConsumerAddress" class="form-label">Add Consumer Address:</label>
+                    <div class="input-group">
+                        <input type="text" id="addConsumerAddress" class="form-control" placeholder="0x...">
+                        <div class="input-group-append">
+                            <button id="addConsumerBtn" class="btn btn-primary">Add Consumer<span
+                                    id="addConsumerSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Remove Consumer -->
+                <div class="col-md-6 my-2">
+                    <label for="removeConsumerAddress" class="form-label">Remove Consumer Address:</label>
+                    <div class="input-group">
+                        <input type="text" id="removeConsumerAddress" class="form-control" placeholder="0x...">
+                        <div class="input-group-append">
+                            <button id="removeConsumerBtn" class="btn btn-danger">Remove Consumer <span
+                                    id="removeConsumerSpinner" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true" style="display: none;"></span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consumer Actions -->
+            <div class="my-2">
+                <h4>Consumer Actions</h4>
+                <div class="input-group">
+                    <label for="purchaseItemUPC" class="form-label">UPC of Item to Purchase:</label>
+                    <input type="text" id="purchaseItemUPC" class="form-control" placeholder="UPC">
+                    <div class="input-group-append">
+                        <button id="purchaseItemBtn" class="btn btn-secondary">
+                            Purchase Item
+                            <span id="purchaseItemSpinner" class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true" style="display: none;"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Item Details Display Section -->
+        <section id="itemDetailsSection" class="my-4">
+            <h2>Item Details Display</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <label for="detailsItemUPC" class="form-label">Enter Item UPC:</label>
+                    <input type="text" id="detailsItemUPC" class="form-control" placeholder="Enter UPC for details">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button id="showDetailsBtn" class="btn btn-info">
+                        Show Details
+                        <span id="detailsLoadingSpinner" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true" style="display: none;"></span>
+                    </button>
+                </div>
+            </div>
+            <div id="itemDetailsResult" class="mt-3">
+                <!-- Detailed information will be displayed here -->
+            </div>
+        </section>
+
+
+        <!-- Track Item History Section -->
+        <section id="trackHistorySection" class="my-4">
+            <h2>Track Item History</h2>
+            <div class="row">
+                <div class="col-md-8">
+                    <label for="trackItemUPC" class="form-label">Enter Item UPC:</label>
+                    <input type="text" id="trackItemUPC" class="form-control" placeholder="Enter UPC to track">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button id="trackItemBtn" class="btn btn-info">
+                        Track History
+                        <span id="historyLoadingSpinner" class="spinner-border spinner-border-sm" role="status"
+                            aria-hidden="true" style="display: none;"></span>
+                    </button>
+                </div>
+            </div>
+            <div id="itemHistoryResult" class="mt-3">
+                <!-- Results will be displayed here -->
+            </div>
+        </section>
+
+        <!-- Footer Section -->
+        <footer class="footer mt-auto py-3 bg-light">
+            <div class="container text-center">
+                <span class="text-muted">
+                    Developed by Sheneeza Volcov. For support or inquiries, contact us
+                    at <a href="mailto:thepolyglot8@gmail.com">thepolyglot8@gmail.com</a>.
+                </span>
+                <br />
+                <span class="text-muted">© 2023 Sheneeza Volcov. All rights reserved.</span>
+                <br />
+                <span class="text-muted">
+                    The information provided by this DApp does not constitute investment
+                    advice, financial advice, trading advice, or any other sort of
+                    advice and you should not treat any of the DApp's content as such.
+                    Sheneeza Volcov does not recommend that any cryptocurrency should be
+                    bought, sold, or held by you.
+                </span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Include Bootstrap JS and its dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.0/web3.min.js"></script>
+    <script src="scripts/app.js"></script>
+</body>
+
+</html>
